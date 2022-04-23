@@ -45,7 +45,7 @@ int main(void)
 
     /* ------------- シェーダ ------------- */ // 光や影ではない　           本質→プログラム
 
-
+    // ######
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
