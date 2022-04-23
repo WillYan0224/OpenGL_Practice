@@ -11,7 +11,7 @@ int main(void)
         return -1;
 
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
+    window = glfwCreateWindow(800, 640, "Hello World", NULL, NULL);
     if (!window)
     {
         glfwTerminate();
@@ -31,8 +31,9 @@ int main(void)
          0.5f, -0.5f
     };
 
-    std::cout << glGetString(GL_VERSION) << std::endl;
 
+    std::cout << glGetString(GL_VERSION) << std::endl;
+    
     unsigned int buffer;
     glGenBuffers(1, &buffer); // バッファID生成
     glBindBuffer(GL_ARRAY_BUFFER, buffer); // BINDはSELECTという意味
@@ -45,7 +46,7 @@ int main(void)
 
     /* ------------- シェーダ ------------- */ // 光や影ではない　           本質→プログラム
 
-    // ######
+    
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
