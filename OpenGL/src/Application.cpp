@@ -36,7 +36,7 @@ static unsigned int CompileShader(unsigned int type, const std::string& source) 
 
 static unsigned int CreateShader(const std::string& vertexShader, const std::string& fragmentShader) // Avoid leaking (Static)
 {
-    unsigned int program = glCreateProgram();
+    unsigned int program = glCreateProgram();  // (unsigned int) Program 作成 (for idバッファ)
     unsigned int vs = CompileShader(GL_VERTEX_SHADER, vertexShader); 
     unsigned int fs = CompileShader(GL_FRAGMENT_SHADER, fragmentShader); 
 
@@ -120,7 +120,7 @@ int main(void)
         "{\n"
         "   color = vec4(1.0, 0.0, 0.0, 1.0);\n"
         "}\n";
-
+    /* ↑↑↑↑↑↑↑↑↑↑↑↑ 問題：stringになってる! ↑↑↑↑↑↑↑↑↑↑↑↑ */
       
 
     unsigned int shader = CreateShader(vertexShader, fragmentShader);
