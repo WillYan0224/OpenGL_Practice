@@ -46,7 +46,8 @@ static unsigned int CreateShader(const std::string& vertexShader, const std::str
     glAttachShader(program, fs);
     glLinkProgram(program);
     glValidateProgram(program);
-    /* ------- vs&fs → program -------  */
+	/* ------- vs&fs → program -------  */
+	/* ------- clear shader ------- */
     glDeleteShader(vs);
     glDeleteShader(fs);
 
