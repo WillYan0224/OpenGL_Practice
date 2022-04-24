@@ -120,7 +120,7 @@ int main(void)
         "   color = vec4(1.0, 0.0, 0.0, 1.0);\n"
         "}\n";
 
-      
+  
 
     unsigned int shader = CreateShader(vertexShader, fragmentShader);
 
