@@ -6,6 +6,8 @@
 #include <string>
 #include <sstream>
 
+/* ------------- Debug用 -------------  */
+
 struct ShaderProgramSource
 {
     std::string VertexSource;
@@ -114,16 +116,25 @@ int main(void)
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
 
+    glfwSwapInterval(1); // Vsync
+
     if (glewInit() != GLEW_OK) {
         std::cout << "Error!" << std::endl;
     }
     
-    float positions[6] = { // メモリバッファ
-    	-0.5f, -0.5f,
-         0.0f,  0.5f,
-         0.5f, -0.5f
+    float positions[] = { // メモリバッファ
+        -0.5f, -0.5f, // 0
+         0.5f, -0.5f, // 1
+         0.5f,  0.5f, // 2
+    	-0.5f,  0.5f, // 3
+    	 0.0f,  1.0f, // 4
     };
 
+    unsigned int indices[] = { // 重要：Unsigned
+    	0, 1 , 2,
+        2, 3 , 0,
+        4, 3 , 2,
+    };
 
     std::cout << glGetString(GL_VERSION) << std::endl;
 
@@ -133,21 +144,32 @@ int main(void)
     glBindBuffer(GL_ARRAY_BUFFER, buffer); // BINDはSELECTという意味
 	// glBindBuffer(GL_ARRAY_BUFFER, 0); // 0:　無効なID
 
-	glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(float), positions, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, 6 * 2 *sizeof(float), positions, GL_STATIC_DRAW);
 
  
     glEnableVertexAttribArray(0); //  Enable　重要！！
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0); // バッファlayout作成＋Binding -> index 0に
 
+    /* ------------- インデックス -------------  */
+    unsigned int ibo;
+    glGenBuffers(1, &ibo);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, 12 * sizeof(unsigned int), indices, GL_STATIC_DRAW); // 重点：Unsigned
+
     /* ------------- シェーダ ------------- */ // 光や影ではない　           本質→プログラム
     ShaderProgramSource source = ParseShader("res/shaders/Basic.shader");
 	unsigned int shader = CreateShader(source.VertexSource, source.FragmentSource);
-	glUseProgram(shader);
-
+	glUseProgram(shader); // Shader bounded
+	/* ------------- Uniform: Shader Painting -------------  */ // 重要: Uniformはバインドされたシェーダの後
+    int location = glGetUniformLocation(shader, "u_Color");
+    glUniform4f(location, 0.6f, 0.2, 0.8f, 1.0f); // 4f: vec4(4 Components) & Float
+   
     
-    /* ↑↑↑↑↑↑↑↑↑↑↑↑ 問題：stringになってる! ↑↑↑↑↑↑↑↑↑↑↑↑ */
+
       
 
+    float r = 0.0f;
+    float increment = 0.05f;
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
@@ -155,8 +177,18 @@ int main(void)
         /* Render here */
         glClear(GL_COLOR_BUFFER_BIT); // スクリーン作成
 
-        glDrawArrays(GL_TRIANGLES, 0, 3); // Bindされたバッファを表示
+
+        glUniform4f(location, r, 0.5f, 0.2f, 1.0f); // 4f: vec4(4 Components) & Float
+        // glDrawArrays(GL_TRIANGLES, 0, 3); // Vertex Buffer使う場合は　これを使う
+        glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, nullptr);  // Index Buffer使う場合はこれを使う Drawing 
         // glDrawElements(GL_TRIANGLES, 3, GLfloat, NULL); // 55行目の代わりに(同じ)
+
+        /* ------------- 色変わる ------------- */
+        if (r > 1.0f)
+            increment = -0.005;
+        else if (r < 0.0f)
+            increment = 0.005;
+        r += increment;
 
         /* Swap front and back buffers */
         glfwSwapBuffers(window);
